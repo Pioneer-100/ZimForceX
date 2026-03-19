@@ -2,27 +2,11 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { supabase } from '../../lib/supabaseClient'
-
-interface Job {
-  id: string
-  title: string
-  description: string
-  location: string
-  salary_min: number
-  salary_max: number
-  currency: string
-  job_type: string
-  experience_level: string
-  skills_required: string[]
-  created_at: string
-  posted_by_profile?: {
-    full_name: string
-  }
-}
+import type { User, Job } from '../../types'
 
 export default function JobsPage() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<User | null>(null)
   const [jobs, setJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')

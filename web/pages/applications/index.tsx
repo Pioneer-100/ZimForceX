@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { supabase } from '../../lib/supabaseClient'
-
-interface Application {
+import type { User, Application } from '../../types'
   id: string
   job_id: string
   applicant_id: string

@@ -129,3 +129,57 @@ create policy "Users can update their own applications" on public.applications
 
 create policy "Employers can update application status" on public.applications
   for update using (auth.uid() = (select posted_by from public.jobs where id = job_id));
+
+-- Create credentials table
+create table public.credentials (
+  id uuid default gen_random_uuid() primary key,
+  created_at timestamp with time zone default now(),
+  updated_at timestamp with time zone default now(),
+  user_id uuid references public.profiles(id) on delete cascade not null,
+  credential_type text check (credential_type in ('degree', 'diploma', 'certificate', 'license', 'other')) not null,
+  title text not null,
+  issuing_organization text not null,
+  date_issued date,
+  expiry_date date,
+  document_url text,
+  verification_status text check (verification_status in ('pending', 'verified', 'rejected', 'expired')) default 'pending',
+  verified_at timestamp with time zone,
+  verification_notes text
+);
+
+-- Enable RLS
+alter table public.credentials enable row level security;
+
+-- Create policies
+create policy "Users can view their own credentials" on public.credentials
+  for select using (auth.uid() = user_id);
+
+create policy "Public can view verified credentials" on public.credentials
+  for select using (verification_status = 'verified');
+
+create policy "Users can insert their own credentials" on public.credentials
+  for insert with check (auth.uid() = user_id);
+
+create policy "Users can update their own credentials" on public.credentials
+  for update using (auth.uid() = user_id);
+
+-- Create verifications table to track AI verification results
+create table public.verifications (
+  id uuid default gen_random_uuid() primary key,
+  created_at timestamp with time zone default now(),
+  credential_id uuid references public.credentials(id) on delete cascade not null,
+  verification_status text check (verification_status in ('valid', 'invalid', 'needs_review')) default 'needs_review',
+  ai_confidence_score float,
+  verification_details jsonb,
+  verified_by text default 'ai_service'
+);
+
+-- Enable RLS
+alter table public.verifications enable row level security;
+
+-- Create policies
+create policy "Users can view verifications of their credentials" on public.verifications
+  for select using (auth.uid() = (select user_id from public.credentials where id = credential_id));
+
+create policy "Verifications are inserted by system" on public.verifications
+  for insert with check (true);

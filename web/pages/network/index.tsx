@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { supabase } from '../../lib/supabaseClient'
+import type { User } from '../../types'
 
 interface Profile {
   id: string
@@ -21,7 +22,7 @@ interface Connection {
 
 export default function NetworkPage() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<User | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<Profile[]>([])
   const [connections, setConnections] = useState<Map<string, Connection>>(new Map())

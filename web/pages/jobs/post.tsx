@@ -2,10 +2,23 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { supabase } from '../../lib/supabaseClient'
+import type { User } from '../../types'
+
+interface FormData {
+  title: string
+  description: string
+  location: string
+  salary_min: string
+  salary_max: string
+  currency: string
+  job_type: string
+  experience_level: string
+  skills: string
+}
 
 export default function PostJobPage() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [formData, setFormData] = useState({
