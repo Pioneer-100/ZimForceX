@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0f1724;
+  --foreground: #ffffff;
+  --muted: #94a3b8;
+  --accent: #4f46e5;
+}
+
+body {
+  color: var(--foreground);
+  background:
+    linear-gradient(180deg, rgba(7, 16, 38, 0.6) 0%, rgba(7, 24, 39, 0.6) 100%),
+    url("https://images.pexels.com/photos/5439453/pexels-photo-5439453.jpeg?auto=compress&cs=tinysrgb&w=1600")
+      center/cover no-repeat,
+    #071827;
+  font-family: Inter, system-ui, Segoe UI, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(90deg, #ff7a18, #ffd166);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: #ffd166;
+  }
+}
