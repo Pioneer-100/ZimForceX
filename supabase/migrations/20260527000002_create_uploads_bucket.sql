@@ -3,8 +3,7 @@ insert into storage.buckets (id, name, public)
 values ('uploads', 'uploads', true)
 on conflict (id) do nothing;
 
--- Enable RLS for the objects table if not already enabled
-alter table storage.objects enable row level security;
+
 
 -- Policy to allow public viewing of objects in the uploads bucket
 create policy "Public Access"
