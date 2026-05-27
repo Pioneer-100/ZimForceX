@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { verifyCertificate } from "../../../../../ai/services/verifier";
+import { verifyCertificate } from "@/ai/services/verifier";
 import { namesMatch } from "@/lib/nameMatcher";
 
 // Helper to determine mime type from URL or file name
