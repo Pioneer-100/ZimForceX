@@ -13,6 +13,10 @@ export default function ProfileForm() {
   const [fullName, setFullName] = useState("");
   const [bio, setBio] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [targetRole, setTargetRole] = useState("");
+  const [experienceLevel, setExperienceLevel] = useState("entry");
+  const [isPublic, setIsPublic] = useState(true);
+  const [openToMentoring, setOpenToMentoring] = useState(false);
   
   // Dynamic Skills
   const [skills, setSkills] = useState<string[]>([]);
@@ -55,6 +59,10 @@ export default function ProfileForm() {
         setBio(data.bio || "");
         setAvatarUrl(data.avatar_url || "");
         setSkills(data.skills || []);
+        setTargetRole(data.target_role || "");
+        setExperienceLevel(data.experience_level || "entry");
+        setIsPublic(data.is_public ?? true);
+        setOpenToMentoring(data.open_to_mentoring ?? false);
       }
 
       // Load Credentials
@@ -227,6 +235,10 @@ export default function ProfileForm() {
         bio,
         skills,
         avatar_url: avatarUrl,
+        target_role: targetRole,
+        experience_level: experienceLevel,
+        is_public: isPublic,
+        open_to_mentoring: openToMentoring,
         updated_at: new Date(),
       };
 
@@ -300,6 +312,29 @@ export default function ProfileForm() {
             onChange={(e) => setFullName(e.target.value)}
             className="w-full p-3 bg-surface border border-white/10 rounded-lg text-white placeholder-muted focus:outline-none focus:border-accent"
           />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-white mb-2">Target Role</label>
+          <input
+            type="text"
+            placeholder="e.g. Full Stack Developer"
+            value={targetRole}
+            onChange={(e) => setTargetRole(e.target.value)}
+            className="w-full p-3 bg-surface border border-white/10 rounded-lg text-white placeholder-muted focus:outline-none focus:border-accent"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-white mb-2">Experience Level</label>
+          <select
+            value={experienceLevel}
+            onChange={(e) => setExperienceLevel(e.target.value)}
+            className="w-full p-3 bg-surface border border-white/10 rounded-lg text-white focus:outline-none focus:border-accent appearance-none"
+          >
+            <option value="entry">Entry Level</option>
+            <option value="mid">Mid Level</option>
+            <option value="senior">Senior</option>
+            <option value="executive">Executive</option>
+          </select>
         </div>
       </div>
 
@@ -438,6 +473,34 @@ export default function ProfileForm() {
           >
             <Plus size={18} /> {saving ? "..." : "Upload & Verify"}
           </button>
+        </div>
+      </div>
+
+      {/* Privacy & Settings */}
+      <div className="pb-6 border-b border-white/10 space-y-4">
+        <label className="block text-sm font-semibold text-white mb-1">Privacy & Mentorship</label>
+        <p className="text-xs text-muted mb-4">Control your visibility and networking preferences.</p>
+        
+        <div className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl">
+          <div>
+            <div className="font-semibold text-white text-sm">Public Profile</div>
+            <div className="text-xs text-muted mt-1">Allow others to find you in the network</div>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" className="sr-only peer" checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} />
+            <div className="w-11 h-6 bg-black/40 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent border border-white/10"></div>
+          </label>
+        </div>
+
+        <div className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl">
+          <div>
+            <div className="font-semibold text-white text-sm">Open to Mentoring</div>
+            <div className="text-xs text-muted mt-1">Show a badge indicating you are open to mentoring others</div>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" className="sr-only peer" checked={openToMentoring} onChange={(e) => setOpenToMentoring(e.target.checked)} />
+            <div className="w-11 h-6 bg-black/40 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent border border-white/10"></div>
+          </label>
         </div>
       </div>
 

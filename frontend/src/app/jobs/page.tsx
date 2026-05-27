@@ -16,6 +16,7 @@ export default function JobsPage() {
   const [experienceLevel, setExperienceLevel] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [activeTab, setActiveTab] = useState("all");
 
   useEffect(() => {
     async function loadData() {
@@ -36,17 +37,42 @@ export default function JobsPage() {
     loadData();
   }, []);
 
+  useEffect(() => {
+    if (user || activeTab === 'all') {
+      loadJobs();
+    }
+  }, [activeTab, user]);
+
   async function loadJobs() {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("jobs")
-        .select("*, posted_by_profile:profiles!posted_by(full_name, bio)")
-        .eq("status", "active")
-        .order("created_at", { ascending: false });
+      if (activeTab === "recommended" && user) {
+        const { data, error } = await supabase.rpc("match_jobs", { p_user_id: user.id });
+        if (error) throw error;
+        
+        const jobsData = data || [];
+        const posterIds = Array.from(new Set(jobsData.map((j: any) => j.posted_by)));
+        if (posterIds.length > 0) {
+          const { data: profiles } = await supabase.from("profiles").select("id, full_name, bio").in("id", posterIds);
+          const profileMap = (profiles || []).reduce((acc: any, p: any) => {
+            acc[p.id] = p;
+            return acc;
+          }, {});
+          jobsData.forEach((j: any) => {
+            j.posted_by_profile = profileMap[j.posted_by];
+          });
+        }
+        setJobs(jobsData);
+      } else {
+        const { data, error } = await supabase
+          .from("jobs")
+          .select("*, posted_by_profile:profiles!posted_by(full_name, bio)")
+          .eq("status", "active")
+          .order("created_at", { ascending: false });
 
-      if (error) throw error;
-      setJobs(data || []);
+        if (error) throw error;
+        setJobs(data || []);
+      }
     } catch (err: any) {
       console.error("Error loading jobs:", err.message);
     } finally {
@@ -165,6 +191,32 @@ export default function JobsPage() {
           {/* Main Job Feed */}
           <div className="lg:col-span-3 space-y-6">
             
+            {/* Tabs */}
+            {profile?.role !== "employer" && (
+              <div className="flex border-b border-white/10 mb-6">
+                <button
+                  onClick={() => setActiveTab("all")}
+                  className={`px-6 py-3.5 text-sm font-semibold border-b-2 transition ${
+                    activeTab === "all"
+                      ? "border-accent text-white"
+                      : "border-transparent text-[#94a3b8] hover:text-white"
+                  }`}
+                >
+                  All Jobs
+                </button>
+                <button
+                  onClick={() => setActiveTab("recommended")}
+                  className={`px-6 py-3.5 text-sm font-semibold border-b-2 transition ${
+                    activeTab === "recommended"
+                      ? "border-accent text-white"
+                      : "border-transparent text-[#94a3b8] hover:text-white"
+                  }`}
+                >
+                  Recommended for You
+                </button>
+              </div>
+            )}
+            
             {/* Search Input */}
             <div className="relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#94a3b8]" size={20} />
@@ -265,6 +317,16 @@ export default function JobsPage() {
 
                           {/* Detail Pill Badges */}
                           <div className="flex flex-wrap items-center gap-2 mb-4">
+                            {job.is_target_role && (
+                              <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-500/20 border border-purple-500/40 text-purple-300 rounded-full text-xs font-bold shadow-[0_0_10px_rgba(168,85,247,0.2)]">
+                                🎯 Target Role
+                              </span>
+                            )}
+                            {job.match_percentage > 0 && activeTab === "recommended" && (
+                              <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-500/10 border border-green-500/30 text-green-400 rounded-full text-xs font-bold">
+                                ⭐ {job.match_percentage}% Skill Match
+                              </span>
+                            )}
                             <span className="inline-flex items-center gap-1 px-3 py-1 bg-white/5 border border-white/10 text-white rounded-full text-xs capitalize font-semibold">
                               <Briefcase size={12} className="text-accent" />
                               {job.job_type.replace("_", " ")}

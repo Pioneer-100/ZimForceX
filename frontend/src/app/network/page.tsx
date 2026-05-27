@@ -18,6 +18,7 @@ export default function NetworkPage() {
   const [allConnections, setAllConnections] = useState<any[]>([]);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [mentoringFilter, setMentoringFilter] = useState(false);
   const [actionId, setActionId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -51,8 +52,8 @@ export default function NetworkPage() {
         .from("connections")
         .select(`
           *,
-          sender_profile:profiles!sender_id(*),
-          receiver_profile:profiles!receiver_id(*)
+          sender_profile:profiles!sender_id(*, credentials(verification_status)),
+          receiver_profile:profiles!receiver_id(*, credentials(verification_status))
         `)
         .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`);
 
@@ -63,12 +64,21 @@ export default function NetworkPage() {
     }
   }
 
-  async function searchUsers(userId: string, query: string) {
+  async function searchUsers(userId: string, query: string, mentoringOnly: boolean = false) {
     try {
-      let req = supabase.from("profiles").select("*").neq("id", userId).limit(20);
+      let req = supabase
+        .from("profiles")
+        .select(`*, credentials(verification_status)`)
+        .eq("is_public", true)
+        .neq("id", userId)
+        .limit(20);
 
       if (query.trim()) {
         req = req.or(`full_name.ilike.%${query}%,bio.ilike.%${query}%`);
+      }
+      
+      if (mentoringOnly) {
+        req = req.eq("open_to_mentoring", true);
       }
 
       const { data, error } = await req;
@@ -79,10 +89,16 @@ export default function NetworkPage() {
     }
   }
 
+  useEffect(() => {
+    if (user && activeTab === "discover") {
+      searchUsers(user.id, searchQuery, mentoringFilter);
+    }
+  }, [mentoringFilter]);
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (user) {
-      searchUsers(user.id, searchQuery);
+      searchUsers(user.id, searchQuery, mentoringFilter);
     }
   };
 
@@ -227,7 +243,7 @@ export default function NetworkPage() {
         {/* Tab Contents: DISCOVER */}
         {activeTab === "discover" && (
           <div className="space-y-6">
-            <form onSubmit={handleSearchSubmit} className="relative">
+            <form onSubmit={handleSearchSubmit} className="relative mb-4">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#94a3b8]" size={20} />
               <input
                 type="text"
@@ -237,6 +253,17 @@ export default function NetworkPage() {
                 className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:border-accent placeholder:text-[#475569] backdrop-blur-sm transition-all focus:ring-1 focus:ring-accent/50 text-sm"
               />
             </form>
+            <div className="flex items-center gap-2 mb-6">
+              <label className="flex items-center gap-2 cursor-pointer text-sm text-[#94a3b8] hover:text-white transition">
+                <input 
+                  type="checkbox" 
+                  checked={mentoringFilter} 
+                  onChange={(e) => setMentoringFilter(e.target.checked)}
+                  className="rounded border-white/20 bg-white/5 text-accent focus:ring-accent/50"
+                />
+                Open to Mentoring
+              </label>
+            </div>
 
             {searchResults.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -307,7 +334,14 @@ export default function NetworkPage() {
                           {actionBtn}
                         </div>
 
-                        <h3 className="font-bold text-white text-base leading-tight mb-0.5">{p.full_name || "Professional"}</h3>
+                        <h3 className="font-bold text-white text-base leading-tight mb-0.5 flex items-center gap-2">
+                          <Link href={`/profile/${p.id}`} className="hover:text-accent transition">{p.full_name || "Professional"}</Link>
+                          {p.credentials && p.credentials.length > 0 && (
+                            <span className="px-1.5 py-0.5 bg-green-500/10 border border-green-500/30 text-green-400 rounded text-[9px] uppercase tracking-wider font-bold" title="AI Verified Credentials">
+                              Verified
+                            </span>
+                          )}
+                        </h3>
                         <span className="text-[10px] text-accent uppercase font-bold tracking-wider capitalize block mb-3">
                           {p.role?.replace("_", " ")}
                         </span>
@@ -386,7 +420,14 @@ export default function NetworkPage() {
                           </button>
                         </div>
 
-                        <h3 className="font-bold text-white text-base leading-tight mb-0.5">{p.full_name || "Professional"}</h3>
+                        <h3 className="font-bold text-white text-base leading-tight mb-0.5 flex items-center gap-2">
+                          <Link href={`/profile/${p.id}`} className="hover:text-accent transition">{p.full_name || "Professional"}</Link>
+                          {p.credentials && p.credentials.length > 0 && (
+                            <span className="px-1.5 py-0.5 bg-green-500/10 border border-green-500/30 text-green-400 rounded text-[9px] uppercase tracking-wider font-bold" title="AI Verified Credentials">
+                              Verified
+                            </span>
+                          )}
+                        </h3>
                         <span className="text-[10px] text-accent uppercase font-bold tracking-wider capitalize block mb-3">
                           {p.role?.replace("_", " ")}
                         </span>
