@@ -92,9 +92,26 @@ export default function Header() {
                     </Link>
                   </>
                 ) : (
-                  <Link href="/network" className="text-[#94a3b8] hover:text-white transition text-sm font-medium">
-                    Network
-                  </Link>
+                  <>
+                    <Link href="/network" className="text-[#94a3b8] hover:text-white transition text-sm font-medium">
+                      Network
+                    </Link>
+                    <Link href="/learning" className="text-[#94a3b8] hover:text-white transition text-sm font-medium">
+                      Learning
+                    </Link>
+                    <Link href="/mentorship" className="text-[#94a3b8] hover:text-white transition text-sm font-medium">
+                      Mentorship
+                    </Link>
+                    <Link href="/gigs" className="text-[#94a3b8] hover:text-white transition text-sm font-medium">
+                      Gigs
+                    </Link>
+                    <Link href="/events" className="text-[#94a3b8] hover:text-white transition text-sm font-medium">
+                      Events
+                    </Link>
+                    <Link href="/community" className="text-[#94a3b8] hover:text-white transition text-sm font-medium">
+                      Community
+                    </Link>
+                  </>
                 )}
                 <div className="flex items-center gap-4 border-l border-white/10 pl-6">
                   <Link href="/profile" className="px-4 py-2 bg-white/5 border border-white/10 text-white rounded-lg hover:bg-white/10 transition font-semibold text-sm">
