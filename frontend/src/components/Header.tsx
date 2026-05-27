@@ -74,9 +74,6 @@ export default function Header() {
             ZimForceX
           </Link>
           <nav className="flex items-center gap-6">
-            <Link href="/" className="text-[#94a3b8] hover:text-white transition text-sm font-medium">
-              Home
-            </Link>
             {user ? (
               <>
                 <Link href="/jobs" className="text-[#94a3b8] hover:text-white transition text-sm font-medium">
@@ -127,6 +124,9 @@ export default function Header() {
               </>
             ) : (
               <>
+                <Link href="/" className="text-[#94a3b8] hover:text-white transition text-sm font-medium">
+                  Home
+                </Link>
                 <Link href="/#features" className="text-[#94a3b8] hover:text-white transition text-sm font-medium hidden sm:block">
                   Features
                 </Link>

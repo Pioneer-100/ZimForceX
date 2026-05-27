@@ -1,6 +1,21 @@
-import React from "react";
+"use client";
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    async function checkUser() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        router.push("/jobs");
+      }
+    }
+    checkUser();
+  }, [router]);
+
   return (
     <main>
       <section className="py-20 md:py-32">
