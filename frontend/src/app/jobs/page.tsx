@@ -50,7 +50,10 @@ export default function JobsPage() {
         const { data, error } = await supabase.rpc("match_jobs", { p_user_id: user.id });
         if (error) throw error;
         
-        const jobsData = data || [];
+        const jobsData = (data || []).map((j: any) => ({
+          ...j,
+          id: j.job_id || j.id
+        }));
         const posterIds = Array.from(new Set(jobsData.map((j: any) => j.posted_by)));
         if (posterIds.length > 0) {
           const { data: profiles } = await supabase.from("profiles").select("id, full_name, bio").in("id", posterIds);
