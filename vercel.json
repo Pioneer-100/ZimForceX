@@ -1,0 +1,11 @@
+{
+  "buildCommand": "cd frontend && npm run build",
+  "outputDirectory": "frontend/.next",
+  "framework": "nextjs",
+  "crons": [
+    {
+      "path": "/api/scrape-jobs",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import Header from '../components/Header'
+import ChatDrawer from '../components/ChatDrawer'
 
 export const metadata: Metadata = {
   title: 'ZimForceX — Connect. Share. Grow.',
@@ -17,6 +18,7 @@ export default function RootLayout({
       <body>
         <Header />
         {children}
+        <ChatDrawer />
       </body>
     </html>
   )

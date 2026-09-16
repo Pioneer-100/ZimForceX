@@ -18,30 +18,37 @@ export default function JobsPage() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
 
-  useEffect(() => {
-    async function loadData() {
-      // Load user session
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-      setUser(currentUser);
-      if (currentUser) {
-        const { data: profileData } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", currentUser.id)
-          .single();
-        setProfile(profileData);
-      }
+  const [userLoaded, setUserLoaded] = useState(false);
 
-      await loadJobs();
+  // 1. Initial load of user session & profile
+  useEffect(() => {
+    async function loadSession() {
+      try {
+        const { data: { user: currentUser } } = await supabase.auth.getUser();
+        setUser(currentUser);
+        if (currentUser) {
+          const { data: profileData } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", currentUser.id)
+            .single();
+          setProfile(profileData);
+        }
+      } catch (err: any) {
+        console.error("Error loading user or profile:", err?.message || err);
+      } finally {
+        setUserLoaded(true);
+      }
     }
-    loadData();
+    loadSession();
   }, []);
 
+  // 2. Fetch jobs whenever activeTab or user session load status changes
   useEffect(() => {
-    if (user || activeTab === 'all') {
+    if (userLoaded) {
       loadJobs();
     }
-  }, [activeTab, user]);
+  }, [activeTab, userLoaded]);
 
   async function loadJobs() {
     setLoading(true);

@@ -272,35 +272,61 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                   </p>
                 </div>
               ) : (
-                <form onSubmit={handleApply} className="space-y-4">
-                  <h3 className="text-lg font-bold text-white mb-2">Submit Application</h3>
-                  <p className="text-xs text-[#94a3b8] mb-4">
-                    Send your verified skills and supporting certificates to this employer.
-                  </p>
+                <>
+                  {(() => {
+                    const match = job?.description?.match(/(https?:\/\/[^\s]+)/gi);
+                    const extUrl = job?.external_url || (match ? match[match.length - 1] : null);
+                    if (extUrl) {
+                      return (
+                        <div className="mb-6 p-4 bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-500/30 rounded-xl space-y-3">
+                          <h4 className="text-xs font-bold text-blue-300 uppercase tracking-wider">External Application</h4>
+                          <p className="text-xs text-[#94a3b8]">
+                            This position was sourced from a partner network. You can apply directly on the official source website.
+                          </p>
+                          <a
+                            href={extUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full inline-flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl font-bold text-sm transition shadow-lg"
+                          >
+                            Apply on Source Website ↗
+                          </a>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
 
-                  <div>
-                    <label className="block text-xs font-semibold text-white mb-2">Cover Letter *</label>
-                    <textarea
-                      rows={6}
-                      required
-                      placeholder="Introduce yourself and explain why your skills match this position..."
-                      value={coverLetter}
-                      onChange={(e) => setCoverLetter(e.target.value)}
-                      className="w-full p-3 bg-[#07111c] border border-white/10 rounded-xl text-white placeholder:text-[#475569] text-xs focus:outline-none focus:border-accent resize-none"
-                    />
-                  </div>
+                  <form onSubmit={handleApply} className="space-y-4">
+                    <h3 className="text-lg font-bold text-white mb-2">Submit Application</h3>
+                    <p className="text-xs text-[#94a3b8] mb-4">
+                      Send your verified skills and supporting certificates to this employer.
+                    </p>
 
-                  <button
-                    type="submit"
-                    disabled={applying || !coverLetter.trim()}
-                    className="w-full py-3 bg-gradient-to-r from-accent to-purple-600 hover:opacity-90 text-white rounded-xl font-bold text-sm tracking-wide transition shadow-lg disabled:opacity-50"
-                  >
-                    {applying ? "Submitting application..." : "Apply Now"}
-                  </button>
-                  <p className="text-[10px] text-center text-[#475569]">
-                    Clicking apply sends your skills profile and matching verified certificates automatically.
-                  </p>
-                </form>
+                    <div>
+                      <label className="block text-xs font-semibold text-white mb-2">Cover Letter *</label>
+                      <textarea
+                        rows={6}
+                        required
+                        placeholder="Introduce yourself and explain why your skills match this position..."
+                        value={coverLetter}
+                        onChange={(e) => setCoverLetter(e.target.value)}
+                        className="w-full p-3 bg-[#07111c] border border-white/10 rounded-xl text-white placeholder:text-[#475569] text-xs focus:outline-none focus:border-accent resize-none"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={applying || !coverLetter.trim()}
+                      className="w-full py-3 bg-gradient-to-r from-accent to-purple-600 hover:opacity-90 text-white rounded-xl font-bold text-sm tracking-wide transition shadow-lg disabled:opacity-50"
+                    >
+                      {applying ? "Submitting application..." : "Apply via ZimForceX"}
+                    </button>
+                    <p className="text-[10px] text-center text-[#475569]">
+                      Clicking apply sends your skills profile and matching verified certificates automatically.
+                    </p>
+                  </form>
+                </>
               )}
             </div>
           </div>

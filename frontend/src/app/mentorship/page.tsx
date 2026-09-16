@@ -87,9 +87,9 @@ export default function MentorshipPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#07111c] pb-20">
+    <div className="min-h-screen pb-20">
       {/* Header */}
-      <div className="bg-[#0a1929] border-b border-white/10 pt-24 pb-12">
+      <div className="bg-white/5 backdrop-blur-md border-b border-white/10 pt-24 pb-12">
         <div className="container mx-auto px-6 max-w-5xl">
           <div className="flex items-center gap-4 mb-4">
             <div className="p-3 bg-gradient-to-br from-accent/20 to-purple-500/20 rounded-xl">

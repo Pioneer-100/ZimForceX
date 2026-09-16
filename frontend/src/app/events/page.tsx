@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { Calendar, MapPin, Users, Video, Plus, Check } from "lucide-react";
+import { Calendar, MapPin, Users, Video, Plus, Check, Clock } from "lucide-react";
 
 export default function EventsPage() {
   const [events, setEvents] = useState<any[]>([]);
@@ -74,8 +74,8 @@ export default function EventsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#07111c] pb-20">
-      <div className="bg-[#0a1929] border-b border-white/10 pt-24 pb-12">
+    <div className="min-h-screen pb-20">
+      <div className="bg-white/5 backdrop-blur-md border-b border-white/10 pt-24 pb-12">
         <div className="container mx-auto px-6 max-w-5xl flex justify-between items-end">
           <div>
             <div className="flex items-center gap-4 mb-4">

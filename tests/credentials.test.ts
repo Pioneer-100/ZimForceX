@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { verifyCertificate } from "../ai/services/verifier";
+import { verifyCertificate } from "../frontend/src/ai/services/verifier";
 
 describe("AI Credential Verification Service", () => {
   beforeEach(() => {

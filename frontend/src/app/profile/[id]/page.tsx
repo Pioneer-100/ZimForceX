@@ -4,7 +4,26 @@ import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { ArrowLeft, User, MapPin, CheckCircle2, ShieldCheck, Award } from "lucide-react";
+import { 
+  ArrowLeft, User, MapPin, CheckCircle2, ShieldCheck, 
+  Award, Globe, Briefcase, Mail, Phone 
+} from "lucide-react";
+
+// Custom Brand SVGs
+const LinkedInIcon = ({ size = 18, className = "" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+    <rect x="2" y="9" width="4" height="12" />
+    <circle cx="4" cy="4" r="2" />
+  </svg>
+);
+
+const GitHubIcon = ({ size = 18, className = "" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+    <path d="M9 18c-4.51 2-5-2-7-2" />
+  </svg>
+);
 
 export default function PublicProfilePage() {
   const { id } = useParams();
@@ -15,6 +34,7 @@ export default function PublicProfilePage() {
   const [profile, setProfile] = useState<any>(null);
   const [credentials, setCredentials] = useState<any[]>([]);
   const [endorsements, setEndorsements] = useState<any[]>([]);
+  const [workExperiences, setWorkExperiences] = useState<any[]>([]);
   
   // Power state for endorsing
   const [canEndorse, setCanEndorse] = useState(false);
@@ -48,6 +68,14 @@ export default function PublicProfilePage() {
         .eq("verification_status", "verified");
       setCredentials(credData || []);
 
+      // Fetch Work Experiences Relational Table
+      const { data: experiencesData } = await supabase
+        .from("work_experiences")
+        .select("*")
+        .eq("user_id", id)
+        .order("start_date", { ascending: false });
+      setWorkExperiences(experiencesData || []);
+
       // Fetch Endorsements
       await fetchEndorsements();
 
@@ -57,7 +85,6 @@ export default function PublicProfilePage() {
         supabase.from("profile_views").insert({ viewer_id: cUser.id, profile_id: id }).then();
 
         // Check endorsement power using RPC or raw query
-        // The power requires being connected + being senior/verified
         const { data: powerData } = await supabase.rpc("can_endorse", { 
           endorser: cUser.id, 
           endorsee: id 
@@ -125,10 +152,11 @@ export default function PublicProfilePage() {
   }
 
   const hasVerifiedCreds = credentials.length > 0;
+  const experiences = workExperiences;
 
   return (
     <main className="min-h-screen py-10">
-      <div className="container mx-auto px-6 max-w-4xl">
+      <div className="container mx-auto px-6 max-w-5xl">
         <Link href="/network" className="inline-flex items-center gap-2 text-[#94a3b8] hover:text-white transition font-medium mb-8">
           <ArrowLeft size={18} /> Back to Network
         </Link>
@@ -143,7 +171,7 @@ export default function PublicProfilePage() {
             )}
           </div>
           
-          <div className="flex-1">
+          <div className="flex-1 w-full">
             <div className="flex flex-wrap items-center gap-3 mb-2">
               <h1 className="text-3xl font-extrabold text-white">{profile.full_name}</h1>
               {hasVerifiedCreds && (
@@ -162,10 +190,41 @@ export default function PublicProfilePage() {
               {profile.target_role || profile.role?.replace("_", " ")} • {profile.experience_level}
             </h2>
             
-            {profile.location && (
-              <div className="flex items-center gap-1 text-sm text-[#94a3b8]">
-                <MapPin size={16} /> {profile.location}
-              </div>
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-[#94a3b8]">
+              {profile.location && (
+                <div className="flex items-center gap-1">
+                  <MapPin size={16} /> {profile.location}
+                </div>
+              )}
+              {profile.email && (
+                <div className="flex items-center gap-1">
+                  <Mail size={16} /> {profile.email}
+                </div>
+              )}
+              {profile.phone_number && (
+                <div className="flex items-center gap-1">
+                  <Phone size={16} /> {profile.phone_number}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Social Icons Header Block */}
+          <div className="flex items-center gap-3 self-start md:self-center mt-4 md:mt-0 bg-black/15 p-3 rounded-2xl border border-white/5">
+            {profile.website && (
+              <a href={profile.website} target="_blank" rel="noreferrer" className="text-muted hover:text-white transition p-2 bg-white/5 rounded-lg border border-white/5">
+                <Globe size={18} />
+              </a>
+            )}
+            {profile.linkedin_url && (
+              <a href={profile.linkedin_url} target="_blank" rel="noreferrer" className="text-muted hover:text-white transition p-2 bg-white/5 rounded-lg border border-white/5">
+                <LinkedInIcon size={18} className="text-muted hover:text-white" />
+              </a>
+            )}
+            {profile.github_url && (
+              <a href={profile.github_url} target="_blank" rel="noreferrer" className="text-muted hover:text-white transition p-2 bg-white/5 rounded-lg border border-white/5">
+                <GitHubIcon size={18} className="text-muted hover:text-white" />
+              </a>
             )}
           </div>
         </div>
@@ -173,6 +232,7 @@ export default function PublicProfilePage() {
         <div className="grid md:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="md:col-span-2 space-y-8">
+            {/* About / Bio */}
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
               <h3 className="text-lg font-bold text-white mb-4 border-b border-white/10 pb-2">About</h3>
               <p className="text-[#94a3b8] leading-relaxed whitespace-pre-wrap">
@@ -180,7 +240,34 @@ export default function PublicProfilePage() {
               </p>
             </div>
 
-            {profile.show_skills && (
+            {/* Past Work Experiences */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+              <h3 className="text-lg font-bold text-white mb-4 border-b border-white/10 pb-2">Past Work Experiences</h3>
+              {experiences.length > 0 ? (
+                <div className="space-y-6">
+                  {experiences.map((exp: any) => (
+                    <div key={exp.id || Math.random()} className="flex gap-4">
+                      <div className="p-3 bg-accent/10 border border-accent/20 text-accent rounded-2xl h-fit">
+                        <Briefcase size={20} />
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="font-bold text-white text-base">{exp.role}</h4>
+                        <p className="text-sm text-blue-300 font-semibold">{exp.company}</p>
+                        <p className="text-xs text-[#94a3b8]">{exp.start_date} — {exp.end_date}</p>
+                        {exp.description && (
+                          <p className="text-sm text-muted leading-relaxed mt-2 whitespace-pre-wrap">{exp.description}</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-[#94a3b8] italic">No work experiences listed yet.</p>
+              )}
+            </div>
+
+            {/* Skills & Endorsements */}
+            {profile.show_skills !== false && (
               <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
                 <h3 className="text-lg font-bold text-white mb-4 border-b border-white/10 pb-2">Skills & Endorsements</h3>
                 
@@ -202,7 +289,6 @@ export default function PublicProfilePage() {
                               )}
                             </div>
                             
-                            {/* Show tiny avatars of endorsers */}
                             {skillEndorsements.length > 0 && (
                               <div className="flex -space-x-2 mt-2">
                                 {skillEndorsements.slice(0, 5).map((e) => (
@@ -262,7 +348,7 @@ export default function PublicProfilePage() {
               </div>
             )}
             
-            {profile.show_connections && (
+            {profile.show_connections !== false && (
               <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
                 <h3 className="text-lg font-bold text-white mb-4 border-b border-white/10 pb-2">Network</h3>
                 <p className="text-sm text-[#94a3b8]">

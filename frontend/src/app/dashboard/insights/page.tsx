@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { BarChart3, TrendingUp, Target, AlertCircle, Briefcase, Eye } from "lucide-react";
+import { BarChart3, TrendingUp, Target, AlertCircle, Briefcase, Eye, CheckCircle2 } from "lucide-react";
 
 export default function InsightsDashboard() {
   const [loading, setLoading] = useState(true);

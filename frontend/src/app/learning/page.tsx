@@ -31,7 +31,7 @@ export default function LearningHubPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#07111c]">
+    <div className="min-h-screen">
       {/* Hero Section */}
       <div className="relative pt-24 pb-12 overflow-hidden border-b border-white/10">
         <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-transparent"></div>
